@@ -910,9 +910,15 @@ module Mongoid
       # @since 3.0.0
       def find_from_parts(modules)
         modules.find do |mod|
-          ActiveSupport::Inflector.constantize(mod).constants.include?(
-            name.to_s.classify.to_sym
-          )
+          if mod.blank?
+            Object.constants.include?(
+              name.to_s.classify.to_sym
+            )
+          else
+            ActiveSupport::Inflector.constantize(mod).constants.include?(
+              name.to_s.classify.to_sym
+            )
+          end
         end
       end
 
