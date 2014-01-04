@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 module Mongoid
   module Validatable
 
@@ -28,6 +29,11 @@ module Mongoid
 
       attr_reader :klass
 
+      def initialize(options={})
+        super
+        @klass = options[:class] if options.has_key?(:class)
+      end
+
       # Unfortunately, we have to tie Uniqueness validators to a class.
       #
       # @example Setup the validator.
@@ -36,8 +42,12 @@ module Mongoid
       # @param [ Class ] klass The class getting validated.
       #
       # @since 1.0.0
-      def setup(klass)
-        @klass = klass
+      if (ActiveModel::VERSION::MAJOR < 4 || (ActiveModel::VERSION::MAJOR == 4 && ActiveModel::VERSION::MINOR == 0))
+        class_eval <<-METHOD
+          def setup(klass)
+            @klass = klass
+          end
+        METHOD
       end
 
       # Validate the document for uniqueness violations.
